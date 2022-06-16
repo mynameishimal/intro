@@ -15,20 +15,46 @@ def testModel(model, test_images, test_labels, fname="model_accuracy"):
     numpy.savetxt(fname, (test_loss, test_acc))
     return
 
-def buildModel():
+def buildFashionModel():
     model = keras.Sequential([
     keras.layers.Flatten(input_shape=(28, 28)),
     keras.layers.Dense(128, activation=tf.nn.relu),
     keras.layers.Dense(10, activation=tf.nn.softmax)
     ])
-
-    model.compile(
-    optimizer='adam',
-    loss='sparse_categorical_crossentropy',
-    metrics=['accuracy']
-    )
-
     return model
+
+def buildCifarCNN(num_kernels, num_hidden):
+    model = keras.models.Sequential()
+    layers = keras.layers
+    model.add(layers.Conv2D(num_kernels, (3, 3), activation='relu', input_shape=(32, 32, 3)))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(num_kernels*2, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(num_kernels*2, (3, 3), activation='relu'))
+
+    model.add(layers.Flatten())
+    model.add(layers.Dense(num_hidden, activation='relu'))
+    model.add(layers.Dense(10))
+    return model
+
+def buildModel(data_name = "fashion_mnist", num_kernels=32, num_hidden=64):
+    switcher = {
+        "fashion_mnist": 0,
+        "mnist_digits": 1,
+        "cifar10": 2,
+        "cifar100": 3,
+    }
+
+    arg= switcher.get(data_name)
+    match arg:
+        case 0:
+            return buildFashionModel();
+        case 1:
+            return;
+        case 2:
+            return buildCifarCNN(num_kernels, num_hidden);
+        case 3:
+            return;
 
 def fitModel(train_images, train_labels, num_epochs, model, use_cb, run_name):
     if use_cb:
