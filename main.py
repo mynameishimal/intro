@@ -1,43 +1,33 @@
-import tensorflow as tf
-import matplotlib
-import numpy
-import nnv
+from funcs import data, net, figures, callbacks
+import sys
+num_epochs=1
+use_cb=True
+dataset_id=0
+run_name = "early_stop_tensorboard_fashion"
+datasets=["fashion_mnist","digits_mnist"]
+# (train_images, train_labels), (test_images, test_labels) = data.load_data(datasets[dataset_id])
 
-from tensorflow import keras
-import matplotlib.pyplot as plt
-import numpy as np
+def main_script(num_epochs=num_epochs,use_cb=use_cb,dataset_id=dataset_id):
+    (train_images, train_labels), (test_images, test_labels) = data.load_data()
 
-from funcs import data, net, figures
 
-(train_images, train_labels), (test_images, test_labels) = data.load_fashion_mnist()
+    train_images, test_images = data.preprocess_fashion_mnist(train_images, test_images)
 
-print(f"Train images dimensions: {train_images.shape}")
-print(f"Test images dimensions: {test_images.shape}")
 
-print('before',train_images[0][:])
+    model = net.buildModel() 
+    net.fitModel(train_images, train_labels, num_epochs, model, use_cb, run_name)
 
-train_images, test_images = data.preprocess_fashion_mnist(train_images, test_images)
-print('after',train_images[0][:])
-model = keras.Sequential([
-    keras.layers.Flatten(input_shape=(28, 28)),
-    keras.layers.Dense(128, activation=tf.nn.relu),
-    keras.layers.Dense(10, activation=tf.nn.softmax)
-    ])
 
-model.compile(
-    optimizer='adam',
-    loss='sparse_categorical_crossentropy',
-    metrics=['accuracy']
-)
+    test_perform_fname='test_perform_epo_'+str(num_epochs)
+    net.testModel(model, test_images, test_labels,fname=test_perform_fname)
 
-model.fit(train_images, train_labels, epochs=1)
+    net.makePredicts(model, test_images)
 
-net.testModel(model, test_images, test_labels)
 
-predictions = model.predict(test_images)
-predictions[1]
-
-np.argmax(predictions[1])
-
-test_labels[1]
-figures.makeCentralFig(test_images)
+if __name__ == "__main__":
+    # print(sys.argv[0]) 
+    num_epochs=int(sys.argv[1])
+    use_cb=sys.argv[2]
+    dataset_id=int(sys.argv[3])
+    main_script(num_epochs=num_epochs,use_cb=use_cb,dataset_id=dataset_id)
+# figures.makeCentralFig(test_images)
