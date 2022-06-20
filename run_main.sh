@@ -15,6 +15,8 @@ num_hidd_nodes_array=(64 256)
 # python ./firstCNN.py -e $num_epoch -d $dataset_id -k $num_kernels -l $num_hidden  
 # python ./firstCNN.py $num_epochs $use_cb $dataset_id $num_kernels $num_hidden
 
+
+
 for c in ${num_kern_array[@]}
     do 
         for k in ${num_hidd_nodes_array[@]}

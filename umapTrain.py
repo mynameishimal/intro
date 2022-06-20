@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 from funcs import data, net, figures, callbacks
 import argparse
 
+from funcs import data, net, figures, callbacks
+
+import pandas as pd
+from umap import UMAP
+import plotly.express as px
+
 data_name = "cifar10"
 run_name = "cifar10"
 
@@ -29,18 +35,28 @@ def main_script(num_epochs=1,dataset_id="cifar10", use_cb = True, num_kernels=32
     history = model.fit(train_images, train_labels, epochs=num_epochs, callbacks = callbacks.tensorboard_cb(run_name=run_name),
                         validation_data=(test_images, test_labels), verbose=1)
 
+    modelInter=net.getInterOutModel(model,intLayerName)
+    intOutputs=modelInter(test_images)
+    df = pd.DataFrame(  data=intOutputs)
+
+    classColumnName="classNames"
+    df[classColumnName] = test_labels
+
+    features = df.loc[:, :classColumnName]
+    umap_3d = UMAP(n_components=3)
+    proj_3d = umap_3d.fit_transform(features)
+    fig_3d = px.scatter_3d(
+        proj_3d, x=0, y=1, z=2,
+    color = df.classNames
+    )
+    fig_3d.update_traces(marker_size=5)
+
+    fig_3d.show()
+
     test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=0)
 
     print(test_acc)
 
-    # model = net.buildModel() 
-    # net.fitModel(train_images, train_labels, num_epochs, model, use_cb, run_name)
-
-
-    # test_perform_fname='test_perform_epo_'+str(num_epochs)
-    # net.testModel(model, test_images, test_labels,fname=test_perform_fname)
-
-    # net.makePredicts(model, test_images)
 
 
 if __name__ == "__main__":

@@ -18,20 +18,22 @@ def main_script(num_epochs=1,dataset_id="cifar10", use_cb = True, num_kernels=32
 
     model = net.buildModel(data_name=data_name, num_kernels=num_kernels, num_hidden=num_hidden)
     model.summary()
+    print(net.getLastLayerWeights(model))
+    figures.makeWeightsPlot(model, net.getLastLayerWeights(model))
 
-    model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+    # model.compile(optimizer='adam',
+    #           loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+    #           metrics=['accuracy'])
 
     run_name = str(data_name) + "_" + str(num_epochs) + "epochs_" + str(num_kernels) + 'kernels_' + str(num_hidden) + 'hidden'
 
 
-    history = model.fit(train_images, train_labels, epochs=num_epochs, callbacks = callbacks.tensorboard_cb(run_name=run_name),
-                        validation_data=(test_images, test_labels), verbose=1)
+    # history = model.fit(train_images, train_labels, epochs=num_epochs, callbacks = callbacks.tensorboard_cb(run_name=run_name),
+    #                     validation_data=(test_images, test_labels), verbose=1)
 
-    test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=0)
+    # test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=0)
 
-    print(test_acc)
+    # print(test_acc)
 
     # model = net.buildModel() 
     # net.fitModel(train_images, train_labels, num_epochs, model, use_cb, run_name)
@@ -45,10 +47,10 @@ def main_script(num_epochs=1,dataset_id="cifar10", use_cb = True, num_kernels=32
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e','--num_epoch', type=int, help="number of epochs")
-    parser.add_argument('-d','--dataset_id', help="dataset id")
-    parser.add_argument('-k','--kern_num', type=int, help='number of kernels')
-    parser.add_argument('-l', '--hiddenLayers', type=int, help='number hidden layers')
+    parser.add_argument('-e','--num_epoch', type=int,default=30, help="number of epochs")
+    parser.add_argument('-d','--dataset_id',default=0, help="dataset id")
+    parser.add_argument('-k','--kern_num', type=int,default=32, help='number of kernels')
+    parser.add_argument('-l', '--hiddenLayers', type=int, default=1, help='number hidden layers')
     args = parser.parse_args()
     main_script(args.num_epoch, args.dataset_id, True, args.kern_num, args.hiddenLayers)
 # figures.makeCentralFig(test_images)

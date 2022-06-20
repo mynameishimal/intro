@@ -6,6 +6,28 @@ import nnv
 from tensorflow import keras
 import matplotlib.pyplot as plt
 import numpy as np
+from funcs import net
+import pandas as pd
+from umap import UMAP
+import plotly.express as px
+
+def makeWeightsPlot(model, class_names):
+    weights = net.getLastLayerWeights(model)
+    pd.options.plotting.backend = "plotly"
+    df = pd.DataFrame(data=weights)
+    fig = df.plot()
+    fig.show()
+    print("hh")
+
+    # print(np.shape(weights))
+    # umap_3d = UMAP(n_components = 3)
+    # proj_3d = umap_3d.fit_transform(features)
+    X=weights[:,:3]
+    fig_3d = px.scatter_3d(
+        X, x=0, y=1, z=2
+    )
+    fig_3d.update_traces(marker_size=5)
+    fig_3d.show()
 
 def makeCentralFig(test_img):
     plt.figure(figsize=(10,5))
@@ -13,6 +35,14 @@ def makeCentralFig(test_img):
     plt.colormaps()
     plt.show()
     return
+
+def showData(history):
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.5, 1])
+    plt.legend(loc='lower right')
 
 def makeNNdiagram():
     from nnv import NNV
